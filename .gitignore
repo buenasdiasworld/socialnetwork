@@ -1,0 +1,9 @@
+.idea
+*.iml
+target
+/scr/main/resources/application-dev.yml
+/scr/main/resources/application.yml
+/scr/main/resources/application-heroku.yml
+/src/test/resources/application-itest.yml
+log
+imgs

@@ -1,0 +1,7 @@
+SET FOREIGN_KEY_CHECKS = 0;
+TRUNCATE TABLE `person`;
+TRUNCATE TABLE `city`;
+TRUNCATE TABLE `country`;
+TRUNCATE TABLE `notification_settings`;
+TRUNCATE TABLE `notification_type`;
+SET FOREIGN_KEY_CHECKS = 1;

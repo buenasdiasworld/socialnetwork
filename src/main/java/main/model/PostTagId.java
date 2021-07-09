@@ -1,0 +1,13 @@
+package main.model;
+
+import lombok.Data;
+
+import javax.persistence.Embeddable;
+import java.io.Serializable;
+
+@Embeddable
+@Data
+public class PostTagId implements Serializable {
+    private int postId;
+    private int tagId;
+}

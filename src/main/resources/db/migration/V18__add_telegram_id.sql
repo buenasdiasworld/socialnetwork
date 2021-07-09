@@ -1,0 +1,1 @@
+alter table person add column telegram_id bigint(19) default 0;

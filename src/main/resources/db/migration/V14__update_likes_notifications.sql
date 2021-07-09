@@ -1,0 +1,2 @@
+alter table notification_type MODIFY COLUMN code enum('POST','POST_COMMENT','COMMENT_COMMENT','FRIEND_REQUEST','MESSAGE', 'FRIEND_BIRTHDAY' , 'LIKE') not null;
+insert into notification_type (id,code,name) values (7,"LIKE","лайк");

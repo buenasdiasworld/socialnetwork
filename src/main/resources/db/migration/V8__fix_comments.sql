@@ -1,0 +1,1 @@
+alter table post_comment modify parent_id integer;

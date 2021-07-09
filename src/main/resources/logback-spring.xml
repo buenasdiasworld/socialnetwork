@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <springProperty scope="context" name="root_path" source="log.path"/>
+    <springProperty scope="context" name="profile" source="spring.profiles.active"/>
+
+    <appender name="app_rolling" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${root_path}/${profile}/app/app.log</file>
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>INFO</level>
+        </filter>
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <fileNamePattern>${root_path}/${profile}/app/archived/app.%d{dd-MM-yy}.%i.log</fileNamePattern>
+            <maxFileSize>10MB</maxFileSize>
+            <maxHistory>14</maxHistory>
+            <totalSizeCap>200MB</totalSizeCap>
+        </rollingPolicy>
+        <encoder>
+            <pattern>[%-5level] %d{dd-MM-yyyy hh:mm:ss} [%thread] %logger{50} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="sql_rolling" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${root_path}/${profile}/sql/sql.log</file>
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>INFO</level>
+        </filter>
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <fileNamePattern>${root_path}/${profile}/sql/archived/sql.%d{dd-MM-yy}.%i.log</fileNamePattern>
+            <maxFileSize>10MB</maxFileSize>
+            <maxHistory>14</maxHistory>
+            <totalSizeCap>400MB</totalSizeCap>
+        </rollingPolicy>
+        <encoder>
+            <pattern>[%-5level] %d{dd-MM-yyyy hh:mm:ss} [%thread] %logger{50} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="console" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>[%-5level] %d{dd-MM-yyyy hh:mm:ss.SSS a} [%thread] %logger{50} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <springProfile name="dev">
+        <root level="info" additivity="false">
+            <appender-ref ref="console"/>
+        </root>
+
+        <logger name="com.bellisi" level="info" additivity="false">
+            <appender-ref ref="console"/>
+            <appender-ref ref="app_rolling"/>
+        </logger>
+
+        <logger name="org.springframework" level="info" additivity="false">
+            <appender-ref ref="app_rolling"/>
+        </logger>
+
+        <logger name="org.hibernate.SQL" level="debug" additivity="false">
+            <appender-ref ref="console"/>
+            <appender-ref ref="sql_rolling"/>
+        </logger>
+    </springProfile>
+
+    <springProfile name="prod" additivity="false">
+        <root level="warn">
+            <appender-ref ref="console"/>
+            <appender-ref ref="app_rolling"/>
+        </root>
+
+        <logger name="com.bellisi" level="warn" additivity="false">
+            <appender-ref ref="console"/>
+            <appender-ref ref="app_rolling"/>
+        </logger>
+
+        <logger name="org.springframework" level="info" additivity="false">
+            <appender-ref ref="app_rolling"/>
+        </logger>
+
+        <logger name="org.hibernate.SQL" level="debug" additivity="false">
+            <appender-ref ref="sql_rolling"/>
+        </logger>
+    </springProfile>
+</configuration>

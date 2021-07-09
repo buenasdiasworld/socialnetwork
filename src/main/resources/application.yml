@@ -1,0 +1,45 @@
+spring:
+  profiles:
+    active: @spring.profiles.active@
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQL5InnoDBDialect
+  boot:
+    admin:
+      client:
+        url: http://zerone.network:9080
+        username: admin
+        password: admin
+server:
+  port: ${PORT:8080}
+app:
+  jwtSecret: MgTCHVTUKiTLQBhwzahsWY03OtBMy0pqd8kAy0VFj1dWHP3dUNj7ThJjAY8ozrK5E1DgWl95KhEMypFFd61R4QMgTCHVTUKiTLQBhwzahsWY03OtBMy0pqd8kAy0VFj1dWHP3dUNj7ThJjAY8ozrK5E1DgWl95KhEMypFFd61R4Q
+  jwtExpirationMs: 86400000
+appEmail:
+  email: email
+  password: password
+reCaptcha:
+  secretCode: 6LdjKe0ZAAAAABh6fjMjCRGKLO7xSNMP_fnu7aEn
+  url: https://www.google.com/recaptcha/api/siteverify?secret=%s&response=%s
+
+logging:
+  config: classpath:logback-spring.xml
+
+notifications:
+  storagePeriod: 3
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  endpoint:
+    health:
+      show-details: always
+
+bot:
+  name: ${BOT_NAME}
+  token: ${BOT_TOKEN}

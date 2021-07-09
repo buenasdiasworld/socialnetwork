@@ -1,0 +1,24 @@
+spring:
+  datasource:
+    url: jdbc:mysql://localhost:3306/network?serverTimezone=UTC
+    username: root
+    password: 1234567
+  jpa:
+    show-sql: false
+
+linkToChange:
+  password: "http://localhost:8080/change-password"
+  email: "http://localhost:8080/shift-email"
+
+upload:
+  path: "src/main/resources/static/static/img"
+
+log:
+  path: "log/javapro"
+
+management:
+  port: 9001
+  endpoints:
+    web:
+      exposure:
+        include: '*'

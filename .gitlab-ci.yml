@@ -1,0 +1,90 @@
+stages:
+  - test
+  - build
+  - backup
+  - deploy
+  - sonar
+# --------------------------- tests ------------------------------
+integration_tests:
+  stage: test
+  script:
+    - /home/gitlab-runner/sonar/bin/linux-x86-64/sonar.sh stop
+    - mvn clean verify -Pintegration-tests -DjdbcUrl=$TEST_DB_URL
+    - /home/gitlab-runner/sonar/bin/linux-x86-64/sonar.sh start
+    - sleep 25
+  only:
+    - merge_requests
+  except:
+    variables:
+      - $CI_MERGE_REQUEST_TARGET_BRANCH_NAME != "dev"
+
+# -------------------------- deploy ------------------------------
+
+build:
+  stage: build
+  script:
+    - mvn -Pprod clean package
+    - sudo systemctl stop networkapp
+    - cp target/Network-1.0-SNAPSHOT.jar /opt/network/prod/app.jar
+  only:
+    - master
+  except:
+    - schedules
+
+production:
+  stage: deploy
+  script:
+    - echo ARG1=--spring.datasource.url=$PROD_DB_URL > /opt/network/prod/.progconf
+    - echo ARG2=--app.jwtSecret=$PROD_JWT_SECRET >> /opt/network/prod/.progconf
+    - echo ARG3=--server.port=$PROD_PORT >> /opt/network/prod/.progconf
+    - echo ARG4=--bot.name=$BOT_NAME >> /opt/network/prod/.progconf
+    - echo ARG5=--bot.token=$BOT_TOKEN >> /opt/network/prod/.progconf
+    - sudo systemctl start networkapp
+  only:
+    - master
+  except:
+    - schedules
+
+build_dev:
+  stage: build
+  script:
+    - mvn -Pprod clean package
+    - sudo systemctl stop networkapp_dev
+    - cp target/Network-1.0-SNAPSHOT.jar /opt/network/dev/app.jar
+  only:
+    - dev
+  except:
+    - schedules
+
+production_dev:
+  stage: deploy
+  script:
+    - echo ARG1=--spring.datasource.url=$DEV_DB_URL > /opt/network/dev/.progconf
+    - echo ARG2=--app.jwtSecret=$DEV_JWT_SECRET >> /opt/network/dev/.progconf
+    - echo ARG3=--server.port=$DEV_PORT >> /opt/network/dev/.progconf
+    - echo ARG4=--bot.name=$BOT_NAME >> /opt/network/dev/.progconf
+    - echo ARG5=--bot.token=$BOT_TOKEN >> /opt/network/dev/.progconf
+    - sudo systemctl start networkapp_dev
+  only:
+    - dev
+  except:
+    - schedules
+
+backup_dev:
+  stage: backup
+  only:
+    - schedules
+    - dev
+  script:
+    - cd ~/backups
+    - find ~/backups -name "network*.gz" -type f -mtime +10 -exec rm -f {} \;
+    - mysqldump -u root network_dev -p$MYSQL_PASSWORD | gzip -c >  "network_dev_$(date +"%F_%T").sql.gz"
+
+sonar_dev:
+  stage: sonar
+  only:
+    - dev
+  script:
+    - mvn -Pintegration-tests -DjdbcUrl=$TEST_DB_URL clean package sonar:sonar
+  except:
+    - schedules
